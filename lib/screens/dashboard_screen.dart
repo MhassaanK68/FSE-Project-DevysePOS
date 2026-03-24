@@ -9,7 +9,7 @@ import '../utils/design_constants.dart';
 import '../widgets/metric_card.dart';
 import '../widgets/settings_menu.dart';
 import 'categories_screen.dart';
-import 'flow_placeholder_screen.dart';
+import 'products_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -127,6 +127,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         );
                       },
                     ),
+                    const SizedBox(width: AppSpacing.sm),
                     const SizedBox(width: AppSpacing.md),
                     const SettingsMenu(),
                   ],
@@ -210,12 +211,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   context,
                                   MaterialPageRoute<void>(
                                     builder: (context) =>
-                                        const FlowPlaceholderScreen(
-                                      title: 'Products',
-                                      description:
-                                          'Product catalog management will be available here.',
-                                      icon: Icons.restaurant_menu_outlined,
-                                    ),
+                                        const ProductsScreen(),
                                   ),
                                 ),
                               ),

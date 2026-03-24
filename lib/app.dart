@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import 'config/app_config.dart';
 import 'providers/category_provider.dart';
+import 'providers/product_provider.dart';
 import 'providers/user_provider.dart';
 import 'utils/design_constants.dart';
 import 'widgets/auth_wrapper.dart';
@@ -16,6 +17,7 @@ class App extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => CategoryProvider()),
+        ChangeNotifierProvider(create: (_) => ProductProvider()),
       ],
       child: MaterialApp(
         title: AppConfig.appName,

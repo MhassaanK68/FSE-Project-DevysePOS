@@ -21,7 +21,7 @@ class AppDatabase {
     final path = join(await getDatabasesPath(), 'devyse_pos.db');
     return openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
     );
@@ -33,6 +33,11 @@ class AppDatabase {
       await db.execute(DatabaseSchema.categoriesNameIndex);
       await db.execute(DatabaseSchema.categoriesActiveIndex);
       await _seedDefaultCategories(db);
+    }
+    if (oldVersion < 3) {
+      await db.execute(DatabaseSchema.productsTable);
+      await db.execute(DatabaseSchema.productsCategoryIndex);
+      await db.execute(DatabaseSchema.productsActiveIndex);
     }
   }
 

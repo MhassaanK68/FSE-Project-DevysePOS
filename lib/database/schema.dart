@@ -28,10 +28,27 @@ class DatabaseSchema {
     )
   ''';
 
+  static const String productsTable = '''
+    CREATE TABLE products (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      description TEXT,
+      price REAL NOT NULL,
+      category TEXT NOT NULL,
+      image_url TEXT,
+      is_active INTEGER NOT NULL DEFAULT 1,
+      product_type TEXT NOT NULL DEFAULT 'regular',
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL,
+      synced_at TEXT
+    )
+  ''';
+
   static const List<String> allTables = [
     usersTable,
     appSettingsTable,
     categoriesTable,
+    productsTable,
   ];
 
   static const String usersUsernameIndex = '''
@@ -46,9 +63,19 @@ class DatabaseSchema {
     CREATE INDEX idx_categories_active ON categories(is_active)
   ''';
 
+  static const String productsCategoryIndex = '''
+    CREATE INDEX idx_products_category ON products(category)
+  ''';
+
+  static const String productsActiveIndex = '''
+    CREATE INDEX idx_products_active ON products(is_active)
+  ''';
+
   static const List<String> allIndexes = [
     usersUsernameIndex,
     categoriesNameIndex,
     categoriesActiveIndex,
+    productsCategoryIndex,
+    productsActiveIndex,
   ];
 }

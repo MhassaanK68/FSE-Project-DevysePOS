@@ -42,3 +42,8 @@ android {
 flutter {
     source = "../.."
 }
+
+dependencies {
+    // UCrop (image_cropper) expects an AppCompat theme on its activity.
+    implementation("androidx.appcompat:appcompat:1.6.1")
+}
