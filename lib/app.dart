@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'config/app_config.dart';
+import 'providers/category_provider.dart';
 import 'providers/user_provider.dart';
 import 'utils/design_constants.dart';
 import 'widgets/auth_wrapper.dart';
@@ -14,6 +15,7 @@ class App extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvider()),
+        ChangeNotifierProvider(create: (_) => CategoryProvider()),
       ],
       child: MaterialApp(
         title: AppConfig.appName,

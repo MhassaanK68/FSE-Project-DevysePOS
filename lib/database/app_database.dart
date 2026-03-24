@@ -21,9 +21,19 @@ class AppDatabase {
     final path = join(await getDatabasesPath(), 'devyse_pos.db');
     return openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: _onCreate,
+      onUpgrade: _onUpgrade,
     );
+  }
+
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await db.execute(DatabaseSchema.categoriesTable);
+      await db.execute(DatabaseSchema.categoriesNameIndex);
+      await db.execute(DatabaseSchema.categoriesActiveIndex);
+      await _seedDefaultCategories(db);
+    }
   }
 
   Future<void> _onCreate(Database db, int version) async {
@@ -35,6 +45,21 @@ class AppDatabase {
     }
     await _seedUsers(db);
     await _seedDefaultSettings(db);
+    await _seedDefaultCategories(db);
+  }
+
+  Future<void> _seedDefaultCategories(Database db) async {
+    final rows = await db.rawQuery('SELECT COUNT(*) AS c FROM categories');
+    final count = (rows.first['c'] as int?) ?? 0;
+    if (count > 0) return;
+    final now = DateTime.now().toIso8601String();
+    await db.insert('categories', {
+      'id': 'default-category-general',
+      'name': 'General',
+      'is_active': 1,
+      'created_at': now,
+      'updated_at': now,
+    });
   }
 
   Future<void> _seedUsers(Database db) async {

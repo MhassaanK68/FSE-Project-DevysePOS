@@ -8,7 +8,7 @@ import '../utils/currency_formatter.dart';
 import '../utils/design_constants.dart';
 import '../widgets/metric_card.dart';
 import '../widgets/settings_menu.dart';
-import 'app_settings_screen.dart';
+import 'categories_screen.dart';
 import 'flow_placeholder_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -177,155 +177,63 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: AppSpacing.section),
-                  Text(
-                    'Quick Actions',
-                    style: AppTextStyles.heading3.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: AppTheme.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
                   Consumer<UserProvider>(
                     builder: (context, userProvider, child) {
-                      final isAdmin = userProvider.isAdmin;
-                      final cards = <Widget>[
-                        _buildActionCard(
-                          icon: Icons.point_of_sale_outlined,
-                          title: 'Sales',
-                          description: 'Process orders and payments',
-                          onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute<void>(
-                              builder: (context) => const FlowPlaceholderScreen(
-                                title: 'Sales',
-                                description:
-                                    'Point of sale checkout will be available here.',
-                                icon: Icons.point_of_sale_outlined,
-                              ),
-                            ),
-                          ),
-                        ),
-                        _buildActionCard(
-                          icon: Icons.receipt_long_outlined,
-                          title: 'Orders',
-                          description: 'View order history',
-                          onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute<void>(
-                              builder: (context) => const FlowPlaceholderScreen(
-                                title: 'Orders',
-                                description:
-                                    'Receipts and transaction history will appear here.',
-                                icon: Icons.receipt_long_outlined,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ];
-
-                      if (isAdmin) {
-                        cards.addAll([
-                          _buildActionCard(
-                            icon: Icons.restaurant_menu_outlined,
-                            title: 'Menu',
-                            description: 'Manage items and pricing',
-                            onTap: () => Navigator.push(
-                              context,
-                              MaterialPageRoute<void>(
-                                builder: (context) =>
-                                    const FlowPlaceholderScreen(
-                                  title: 'Menu',
-                                  description:
-                                      'Product catalog management for admins.',
-                                  icon: Icons.restaurant_menu_outlined,
-                                ),
-                              ),
-                            ),
-                          ),
-                          _buildActionCard(
-                            icon: Icons.category_outlined,
-                            title: 'Categories',
-                            description: 'Manage product categories',
-                            onTap: () => Navigator.push(
-                              context,
-                              MaterialPageRoute<void>(
-                                builder: (context) =>
-                                    const FlowPlaceholderScreen(
-                                  title: 'Categories',
-                                  description:
-                                      'Organize catalog categories from here.',
-                                  icon: Icons.category_outlined,
-                                ),
-                              ),
-                            ),
-                          ),
-                          _buildActionCard(
-                            icon: Icons.inventory_2_outlined,
-                            title: 'Stock',
-                            description: 'Manage inventory levels',
-                            onTap: () {
-                              showDialog<void>(
-                                context: context,
-                                builder: (context) => AlertDialog(
-                                  backgroundColor: AppColors.surface,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius:
-                                        BorderRadius.circular(AppRadius.lg),
-                                  ),
-                                  title: Text(
-                                    'Feature Not Available',
-                                    style: AppTextStyles.heading3.copyWith(
-                                      fontWeight: FontWeight.w600,
-                                      color: AppTheme.textPrimary,
-                                    ),
-                                  ),
-                                  content: Text(
-                                    'Stock management is not implemented yet.',
-                                    style: AppTextStyles.bodyMedium,
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () =>
-                                          Navigator.of(context).pop(),
-                                      child: Text(
-                                        'OK',
-                                        style: AppTextStyles.labelLarge.copyWith(
-                                          color: AppTheme.textSecondary,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                          ),
-                        ]);
+                      if (!userProvider.isAdmin) {
+                        return const SizedBox.shrink();
                       }
-
-                      cards.add(
-                        _buildActionCard(
-                          icon: Icons.settings_suggest_outlined,
-                          title: 'App Settings',
-                          description: 'Store profile and receipts text',
-                          onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute<void>(
-                              builder: (context) =>
-                                  const AppSettingsScreen(),
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: AppSpacing.section),
+                          Text(
+                            'Quick Actions',
+                            style: AppTextStyles.heading3.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: AppTheme.textPrimary,
                             ),
                           ),
-                        ),
-                      );
-
-                      return GridView.count(
-                        crossAxisCount: 4,
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        crossAxisSpacing: AppSpacing.xl,
-                        mainAxisSpacing: AppSpacing.xl,
-                        childAspectRatio: 1.2,
-                        children: cards,
+                          const SizedBox(height: AppSpacing.lg),
+                          GridView.count(
+                            crossAxisCount: 4,
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            crossAxisSpacing: AppSpacing.xl,
+                            mainAxisSpacing: AppSpacing.xl,
+                            childAspectRatio: 1.2,
+                            children: [
+                              _buildActionCard(
+                                icon: Icons.restaurant_menu_outlined,
+                                title: 'Products',
+                                description: 'Manage menu items and pricing',
+                                onTap: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute<void>(
+                                    builder: (context) =>
+                                        const FlowPlaceholderScreen(
+                                      title: 'Products',
+                                      description:
+                                          'Product catalog management will be available here.',
+                                      icon: Icons.restaurant_menu_outlined,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              _buildActionCard(
+                                icon: Icons.category_outlined,
+                                title: 'Categories',
+                                description: 'Manage product categories',
+                                onTap: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute<void>(
+                                    builder: (context) =>
+                                        const CategoriesScreen(),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       );
                     },
                   ),
