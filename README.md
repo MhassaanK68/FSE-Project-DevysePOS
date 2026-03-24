@@ -1,5 +1,17 @@
 # DevysePOS - Modern Point of Sale System
 
+---
+
+## Important Disclaimer: 
+
+> In-store point of sale is run on tablet form factors, not phones. The UI and flows are designed and tested for larger screens only.
+>
+> Do not expect phones or small, narrow devices to work well. Layout, touch targets, and navigation are not adapted for mobile-sized screens and may be broken or unusable there. Use an Android tablet (or desktop/web only for development convenience).
+>
+> However, if a tablet is unavailable, for testing purpose we recommend using the app in landscape mode for a better user experience
+
+---
+
 ## Description
 DevysePOS is an offline-first Point of Sale application designed for Android tablets. It allows retail businesses to manage sales, inventory, and categories without requiring a constant internet connection, using role-based access for Admins and Cashiers.
 
