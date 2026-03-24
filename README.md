@@ -1,16 +1,45 @@
-# devyse_pos
+# DevysePOS - Modern Point of Sale System
 
-Devyse POS — point of sale.
+## Description
+DevysePOS is an offline-first Point of Sale application designed for Android tablets. It allows retail businesses to manage sales, inventory, and categories without requiring a constant internet connection, using role-based access for Admins and Cashiers.
 
-## Getting Started
+## Team Members
+- Hassan Mehmood (24L-2559)
+- Sufyan Sohail (24L-2601)
+- Muaaz Fahad (24L-2563)
 
-This project is a starting point for a Flutter application.
+## Tech Stack
+- **Backend:** ExpressJS API (Server)
+- **Frontend:** Flutter / UI Components (Client)
+- **Database:** SQLite (Client) and MySQL (Server)
 
-A few resources to get you started if this is your first Flutter project:
+---
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## How to Run
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### Flutter app (this repository)
+
+The project root is the folder that contains `pubspec.yaml`.
+
+1. **Prerequisites:** [Flutter SDK](https://docs.flutter.dev/get-started/install) matching the Dart SDK in `pubspec.yaml` (^3.10), plus tooling for your target (e.g. Android SDK for tablets, or a desktop/web device for local testing).
+
+2. Install dependencies:
+   ```bash
+   flutter pub get
+   ```
+
+3. Verify your environment:
+   ```bash
+   flutter doctor
+   ```
+
+4. List devices and run:
+   ```bash
+   flutter devices
+   flutter run
+   ```
+   Use `flutter run -d <device_id>` to pick a specific device.
+
+### Express API / MySQL (server)
+
+The Express backend is part of the planned stack but is **not** included in this repository yet. Run instructions for the API will be added when the server code is published alongside this client.
