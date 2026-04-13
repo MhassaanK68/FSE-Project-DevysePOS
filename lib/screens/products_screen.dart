@@ -655,6 +655,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
     final categoryProvider =
         Provider.of<CategoryProvider>(context, listen: false);
     await categoryProvider.loadCategories(activeOnly: true);
+    if (!context.mounted) return;
     final categories = categoryProvider.categories.map((c) => c.name).toList();
     String selectedCategory =
         categories.isNotEmpty ? categories.first : '';
@@ -662,6 +663,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
     final productProvider =
         Provider.of<ProductProvider>(context, listen: false);
     await productProvider.loadProducts(activeOnly: true);
+    if (!context.mounted) return;
     final regularProducts = productProvider.products
         .where((p) => p.productType == 'regular')
         .toList();
@@ -747,7 +749,11 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: AppSpacing.lg),
                                 child: DropdownButtonFormField<String>(
-                                  value: selectedCategory,
+                                  key: ValueKey<String>(selectedCategory),
+                                  initialValue: categories.contains(
+                                          selectedCategory)
+                                      ? selectedCategory
+                                      : categories.first,
                                   decoration: const InputDecoration(
                                     labelText: 'Category',
                                     border: InputBorder.none,

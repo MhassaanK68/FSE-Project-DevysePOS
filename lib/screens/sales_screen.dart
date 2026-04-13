@@ -284,7 +284,7 @@ class _SalesScreenState extends State<SalesScreen> {
                             File(product.imageUrl!),
                             width: double.infinity,
                             fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) =>
+                            errorBuilder: (context, error, stackTrace) =>
                                 const PlaceholderImage(),
                           )
                         : const PlaceholderImage(),
@@ -410,7 +410,7 @@ class _SalesScreenState extends State<SalesScreen> {
                     : ListView.separated(
                         padding: const EdgeInsets.all(AppSpacing.md),
                         itemCount: cart.items.length,
-                        separatorBuilder: (_, __) =>
+                        separatorBuilder: (context, index) =>
                             const Divider(height: 1),
                         itemBuilder: (context, index) {
                           final item = cart.items[index];
@@ -702,10 +702,10 @@ class _SalesScreenState extends State<SalesScreen> {
       final transaction = await cart.processPayment(
         cashierUsername: user.currentUser?.username ?? 'unknown',
       );
-      if (!mounted) return;
+      if (!context.mounted) return;
       _showSuccessDialog(context, transaction.transactionNumber);
     } catch (e) {
-      if (!mounted) return;
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Payment failed: $e'),
