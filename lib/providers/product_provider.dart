@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../models/combo_item.dart';
 import '../models/product.dart';
 import '../services/database_service.dart';
 
@@ -110,6 +111,44 @@ class ProductProvider with ChangeNotifier {
       _error = e.toString();
       notifyListeners();
       return false;
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Combo products
+  // ---------------------------------------------------------------------------
+
+  Future<bool> addComboProduct(Product combo, List<ComboItem> items) async {
+    try {
+      await _databaseService.insertComboWithItems(combo, items);
+      await loadProducts(activeOnly: _lastActiveOnlyFilter);
+      return true;
+    } catch (e) {
+      _error = _mapProductError(e);
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<bool> updateComboProduct(Product combo, List<ComboItem> items) async {
+    try {
+      await _databaseService.updateComboWithItems(combo, items);
+      await loadProducts(activeOnly: _lastActiveOnlyFilter);
+      return true;
+    } catch (e) {
+      _error = _mapProductError(e);
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<List<ComboItem>> getComboItems(String comboProductId) async {
+    try {
+      return await _databaseService.getComboItems(comboProductId);
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+      return [];
     }
   }
 

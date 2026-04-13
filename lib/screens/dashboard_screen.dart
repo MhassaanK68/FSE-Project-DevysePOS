@@ -10,6 +10,8 @@ import '../widgets/metric_card.dart';
 import '../widgets/settings_menu.dart';
 import 'categories_screen.dart';
 import 'products_screen.dart';
+import 'sales_screen.dart';
+import 'transaction_history_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -180,9 +182,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                   Consumer<UserProvider>(
                     builder: (context, userProvider, child) {
-                      if (!userProvider.isAdmin) {
-                        return const SizedBox.shrink();
-                      }
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -204,29 +203,55 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             childAspectRatio: 1.2,
                             children: [
                               _buildActionCard(
-                                icon: Icons.restaurant_menu_outlined,
-                                title: 'Products',
-                                description: 'Manage menu items and pricing',
+                                icon: Icons.point_of_sale_outlined,
+                                title: 'New Sale',
+                                description: 'Process a new order',
                                 onTap: () => Navigator.push(
                                   context,
                                   MaterialPageRoute<void>(
                                     builder: (context) =>
-                                        const ProductsScreen(),
+                                        const SalesScreen(),
                                   ),
-                                ),
+                                ).then((_) => _loadMetrics()),
                               ),
                               _buildActionCard(
-                                icon: Icons.category_outlined,
-                                title: 'Categories',
-                                description: 'Manage product categories',
+                                icon: Icons.receipt_long_outlined,
+                                title: 'Transactions',
+                                description: 'View past sales history',
                                 onTap: () => Navigator.push(
                                   context,
                                   MaterialPageRoute<void>(
                                     builder: (context) =>
-                                        const CategoriesScreen(),
+                                        const TransactionHistoryScreen(),
                                   ),
                                 ),
                               ),
+                              if (userProvider.isAdmin) ...[
+                                _buildActionCard(
+                                  icon: Icons.restaurant_menu_outlined,
+                                  title: 'Products',
+                                  description: 'Manage menu items and pricing',
+                                  onTap: () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute<void>(
+                                      builder: (context) =>
+                                          const ProductsScreen(),
+                                    ),
+                                  ),
+                                ),
+                                _buildActionCard(
+                                  icon: Icons.category_outlined,
+                                  title: 'Categories',
+                                  description: 'Manage product categories',
+                                  onTap: () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute<void>(
+                                      builder: (context) =>
+                                          const CategoriesScreen(),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ],
                           ),
                         ],

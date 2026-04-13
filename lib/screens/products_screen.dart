@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
+import '../models/combo_item.dart';
 import '../models/product.dart';
 import '../providers/category_provider.dart';
 import '../providers/product_provider.dart';
@@ -646,6 +647,309 @@ class _ProductsScreenState extends State<ProductsScreen> {
     );
   }
 
+  void _showCreateComboDialog(BuildContext context) async {
+    final nameController = TextEditingController();
+    final priceController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+
+    final categoryProvider =
+        Provider.of<CategoryProvider>(context, listen: false);
+    await categoryProvider.loadCategories(activeOnly: true);
+    final categories = categoryProvider.categories.map((c) => c.name).toList();
+    String selectedCategory =
+        categories.isNotEmpty ? categories.first : '';
+
+    final productProvider =
+        Provider.of<ProductProvider>(context, listen: false);
+    await productProvider.loadProducts(activeOnly: true);
+    final regularProducts = productProvider.products
+        .where((p) => p.productType == 'regular')
+        .toList();
+
+    final selectedComponents = <String, int>{};
+
+    if (!context.mounted) return;
+
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setModalState) => Dialog(
+          backgroundColor: AppColors.surface,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadius.lg),
+          ),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 650, maxHeight: 750),
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.xl),
+              child: Form(
+                key: formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Create Combo',
+                      style: AppTextStyles.heading3.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: AppTheme.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.xl),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            TextFormField(
+                              controller: nameController,
+                              textCapitalization: TextCapitalization.words,
+                              decoration: const InputDecoration(
+                                labelText: 'Combo Name',
+                              ),
+                              validator: (v) => (v == null || v.isEmpty)
+                                  ? 'Enter combo name'
+                                  : null,
+                            ),
+                            const SizedBox(height: AppSpacing.lg),
+                            TextFormField(
+                              controller: priceController,
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                      decimal: true),
+                              inputFormatters: [
+                                FilteringTextInputFormatter.allow(
+                                    RegExp(r'^\d+\.?\d{0,2}')),
+                              ],
+                              decoration: const InputDecoration(
+                                labelText: 'Combo Price',
+                              ),
+                              validator: (v) {
+                                if (v == null || v.isEmpty) {
+                                  return 'Enter combo price';
+                                }
+                                if (double.tryParse(v) == null) {
+                                  return 'Enter valid number';
+                                }
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: AppSpacing.lg),
+                            if (categories.isNotEmpty)
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: AppColors.greyVeryLight,
+                                  borderRadius:
+                                      BorderRadius.circular(AppRadius.button),
+                                  border:
+                                      Border.all(color: AppTheme.divider),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: AppSpacing.lg),
+                                child: DropdownButtonFormField<String>(
+                                  value: selectedCategory,
+                                  decoration: const InputDecoration(
+                                    labelText: 'Category',
+                                    border: InputBorder.none,
+                                  ),
+                                  items: categories
+                                      .map((c) => DropdownMenuItem(
+                                          value: c, child: Text(c)))
+                                      .toList(),
+                                  onChanged: (v) => setModalState(
+                                      () => selectedCategory = v ?? ''),
+                                ),
+                              ),
+                            const SizedBox(height: AppSpacing.xl),
+                            Text(
+                              'Select Items',
+                              style: AppTextStyles.labelLarge.copyWith(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: AppSpacing.sm),
+                            if (regularProducts.isEmpty)
+                              Padding(
+                                padding: const EdgeInsets.all(AppSpacing.lg),
+                                child: Text(
+                                  'No regular products available',
+                                  style: AppTextStyles.bodyMedium
+                                      .copyWith(color: AppTheme.textSecondary),
+                                ),
+                              )
+                            else
+                              ...regularProducts.map((product) {
+                                final isSelected = selectedComponents
+                                    .containsKey(product.id);
+                                final qty =
+                                    selectedComponents[product.id] ?? 0;
+                                return Container(
+                                  margin: const EdgeInsets.only(
+                                      bottom: AppSpacing.sm),
+                                  decoration: BoxDecoration(
+                                    color: isSelected
+                                        ? AppColors.primary
+                                            .withValues(alpha: 0.05)
+                                        : AppColors.greyVeryLight,
+                                    borderRadius: BorderRadius.circular(
+                                        AppRadius.sm),
+                                    border: Border.all(
+                                      color: isSelected
+                                          ? AppColors.primary
+                                          : AppTheme.divider,
+                                    ),
+                                  ),
+                                  child: ListTile(
+                                    dense: true,
+                                    title: Text(product.name,
+                                        style: AppTextStyles.labelLarge),
+                                    subtitle: Text(
+                                      CurrencyFormatter.format(
+                                          product.price),
+                                      style: AppTextStyles.bodySmall,
+                                    ),
+                                    trailing: isSelected
+                                        ? Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              IconButton(
+                                                icon: const Icon(
+                                                    Icons.remove,
+                                                    size: 18),
+                                                onPressed: () {
+                                                  setModalState(() {
+                                                    if (qty <= 1) {
+                                                      selectedComponents
+                                                          .remove(
+                                                              product.id);
+                                                    } else {
+                                                      selectedComponents[
+                                                              product.id] =
+                                                          qty - 1;
+                                                    }
+                                                  });
+                                                },
+                                              ),
+                                              Text('$qty',
+                                                  style: AppTextStyles
+                                                      .labelLarge),
+                                              IconButton(
+                                                icon: const Icon(
+                                                    Icons.add,
+                                                    size: 18),
+                                                onPressed: () {
+                                                  setModalState(() {
+                                                    selectedComponents[
+                                                            product.id] =
+                                                        qty + 1;
+                                                  });
+                                                },
+                                              ),
+                                            ],
+                                          )
+                                        : IconButton(
+                                            icon: const Icon(
+                                                Icons.add_circle_outline,
+                                                color: AppColors.primary),
+                                            onPressed: () {
+                                              setModalState(() {
+                                                selectedComponents[
+                                                    product.id] = 1;
+                                              });
+                                            },
+                                          ),
+                                  ),
+                                );
+                              }),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.xl),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: Text(
+                            'Cancel',
+                            style: AppTextStyles.labelLarge
+                                .copyWith(color: AppTheme.textSecondary),
+                          ),
+                        ),
+                        const SizedBox(width: AppSpacing.md),
+                        ElevatedButton(
+                          onPressed: () async {
+                            if (!formKey.currentState!.validate()) return;
+                            if (selectedComponents.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: const Text(
+                                      'Select at least one item for the combo'),
+                                  backgroundColor: AppColors.error,
+                                ),
+                              );
+                              return;
+                            }
+
+                            final now = DateTime.now();
+                            final comboId = UUIDGenerator.generate();
+                            final combo = Product(
+                              id: comboId,
+                              name: nameController.text.trim(),
+                              price:
+                                  double.parse(priceController.text),
+                              category: selectedCategory,
+                              productType: 'combo',
+                              createdAt: now,
+                              updatedAt: now,
+                            );
+                            final items = selectedComponents.entries
+                                .map((e) => ComboItem(
+                                      id: UUIDGenerator.generate(),
+                                      comboProductId: comboId,
+                                      componentProductId: e.key,
+                                      quantity: e.value,
+                                      createdAt: now,
+                                    ))
+                                .toList();
+
+                            if (!context.mounted) return;
+                            final pp = Provider.of<ProductProvider>(
+                                context,
+                                listen: false);
+                            final ok =
+                                await pp.addComboProduct(combo, items);
+                            if (context.mounted) {
+                              if (ok) {
+                                Navigator.pop(context);
+                                _loadProducts();
+                              } else {
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(
+                                  SnackBar(
+                                    content: Text(pp.error ??
+                                        'Failed to create combo'),
+                                    backgroundColor: AppColors.error,
+                                  ),
+                                );
+                              }
+                            }
+                          },
+                          child: const Text('Create Combo'),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildImagePlaceholder() {
     return Container(
       decoration: BoxDecoration(
@@ -842,6 +1146,11 @@ class _ProductsScreenState extends State<ProductsScreen> {
                 onPressed: () => _showAddProductDialog(context),
                 tooltip: 'Add Product',
               ),
+              IconButton(
+                icon: const Icon(Icons.playlist_add),
+                onPressed: () => _showCreateComboDialog(context),
+                tooltip: 'Create Combo',
+              ),
             ],
           ),
           body: Consumer<ProductProvider>(
@@ -999,15 +1308,43 @@ class _ProductsScreenState extends State<ProductsScreen> {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
-                                            Text(
-                                              product.name,
-                                              style: AppTextStyles.bodyLarge
-                                                  .copyWith(
-                                                fontWeight: FontWeight.w600,
-                                                color: product.isActive
-                                                    ? AppTheme.textPrimary
-                                                    : AppTheme.textTertiary,
-                                              ),
+                                            Row(
+                                              children: [
+                                                Flexible(
+                                                  child: Text(
+                                                    product.name,
+                                                    style: AppTextStyles.bodyLarge
+                                                        .copyWith(
+                                                      fontWeight: FontWeight.w600,
+                                                      color: product.isActive
+                                                          ? AppTheme.textPrimary
+                                                          : AppTheme.textTertiary,
+                                                    ),
+                                                    overflow: TextOverflow.ellipsis,
+                                                  ),
+                                                ),
+                                                if (product.productType == 'combo') ...[
+                                                  const SizedBox(width: AppSpacing.sm),
+                                                  Container(
+                                                    padding: const EdgeInsets.symmetric(
+                                                      horizontal: AppSpacing.sm,
+                                                      vertical: 2,
+                                                    ),
+                                                    decoration: BoxDecoration(
+                                                      color: AppColors.primary.withValues(alpha: 0.15),
+                                                      borderRadius: BorderRadius.circular(AppRadius.sm),
+                                                    ),
+                                                    child: Text(
+                                                      'COMBO',
+                                                      style: AppTextStyles.labelSmall.copyWith(
+                                                        color: AppColors.primary,
+                                                        fontWeight: FontWeight.w700,
+                                                        fontSize: 10,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ],
                                             ),
                                             const SizedBox(
                                               height: AppSpacing.xs,
